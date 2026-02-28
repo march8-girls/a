@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8 Наурыз – Шақыру</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-rose: #d81b60;
+            --dark-rose: #701a35;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #fff0f5, #fce4ec, #f8bbd0) fixed;
+            overflow-x: hidden;
+            color: var(--dark-rose);
+        }
+
+        #background-particles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .falling-petal {
+            position: absolute;
+            background: rgba(255,182,193,0.6);
+            width: 20px;
+            height: 20px;
+            border-radius: 15px 0 15px 0;
+            animation: float linear infinite;
+        }
+
+        @keyframes float {
+            from { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            to { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+        }
+
+        .screen {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 1s, visibility 1s;
+        }
+
+        .fade-out {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .fade-in {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .glass-card {
+            background: rgba(255,255,255,0.25);
+            backdrop-filter: blur(15px);
+            border-radius: 2.5rem;
+            padding: 4rem 3rem;
+            max-width: 850px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 30px 60px rgba(216,27,96,0.15);
+            animation: cardIn 1.2s ease forwards;
+        }
+
+        @keyframes cardIn {
+            from { transform: translateY(40px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .title-text {
+            font-family: 'Playfair Display', serif;
+            color: #701a35;
+        }
+
+        .btn-next, .btn-yes {
+            background: linear-gradient(135deg, #d81b60, #ff4081);
+            color: white;
+            padding: 1rem 3rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(216,27,96,0.3);
+            transition: 0.3s;
+        }
+
+        .btn-next:hover, .btn-yes:hover {
+            transform: translateY(-3px);
+        }
+
+        .btn-no {
+            background: rgba(255,255,255,0.6);
+            border: 2px solid #ffb6c1;
+            border-radius: 2rem;
+            padding: 1rem 3rem;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .interactive-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="background-particles"></div>
+
+<!-- 1-экран -->
+<div id="screen1" class="screen fade-in">
+    <button class="btn-next" onclick="openGift()">🎁 Сыйлықты ашу</button>
+</div>
+
+<!-- 2-экран -->
+<div id="screen2" class="screen fade-out">
+    <div class="glass-card">
+        <h1 class="title-text text-3xl md:text-4xl mb-6">
+            Сіздерді 8 наурыз – сұлулық пен нәзіктіктің символы болған ерекше мерекеге арналған әсерлі кешімізге шын жүректен шақырамыз!
+        </h1>
+
+        <div class="text-4xl my-6">🌸</div>
+
+        <p class="text-lg mb-6 font-medium">
+            Бұл кеш – жылы күлкіге, әсем әуенге, көтеріңкі көңіл-күй мен ұмытылмас әсерге толы болады.
+        </p>
+
+        <p class="text-lg mb-10 font-medium">
+            Келіңіздер, бірге шаттанып, ерекше атмосферада көктем мерекесін бірге қарсы алайық! 💐✨
+        </p>
+
+        <button class="btn-next" onclick="goToScreen3()">Жауап беру</button>
+    </div>
+</div>
+
+<!-- 3-экран -->
+<div id="screen3" class="screen fade-out">
+    <div class="glass-card">
+        <div id="question-content">
+            <h1 class="title-text text-4xl mb-8">
+                Біздің кештің қонағы боласыз ба? 💖
+            </h1>
+
+            <div class="interactive-buttons">
+                <button id="btnYes" class="btn-yes" onclick="handleYes()">Иә</button>
+                <button id="btnNo" class="btn-no" onclick="handleNo()">Жоқ</button>
+            </div>
+        </div>
+
+        <div id="success-message" style="display:none;">
+            <div class="text-6xl mb-6">💖🌸✨</div>
+            <h1 class="title-text text-4xl mb-4">
+                Сіздің қатысуыңызбен бұл кеш одан да ерекше болмақ! ✨
+            </h1>
+            <p class="text-xl font-medium">Сізді асыға күтеміз! 💐</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function createPetals() {
+        const c = document.getElementById('background-particles');
+        for (let i = 0; i < 30; i++) {
+            const p = document.createElement('div');
+            p.className = 'falling-petal';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            p.style.animationDelay = (-Math.random() * 20) + 's';
+            c.appendChild(p);
+        }
+    }
+    createPetals();
+
+    function openGift() {
+        document.getElementById('screen1').classList.replace('fade-in','fade-out');
+        document.getElementById('screen2').classList.replace('fade-out','fade-in');
+    }
+
+    function goToScreen3() {
+        document.getElementById('screen2').classList.replace('fade-in','fade-out');
+        document.getElementById('screen3').classList.replace('fade-out','fade-in');
+    }
+
+    const noTexts = [
+        "Шынымен келмейсіз бе? 🤍",
+        "Тағы бір ойланасыз ба?",
+        "Біз сізді қатты күтеміз 🥺",
+        "Онсыз да әдемі, бірақ сізбен тіпті керемет!",
+        "Жоқ деу қиын ғой 😌",
+        "Мүмкін бәрібір келерсіз?",
+        "Сізсіз кеш толық болмайды ✨",
+        "Келмесеңіз көңіліміз түсіп қалады...",
+        "Соңғы шешіміңіз осы ма?",
+        "Келіңізші, өкінбейсіз 💐",
+        "Бір рет бас тартып көріңізші 😄",
+        "Иә деп айту әлдеқайда оңай 😉",
+        "Жоқ батырмасы шаршап кетті 😅",
+        "Жарайды, енді ИӘ басайық!",
+        "Келісесіз деп сенеміз ❤️"
+    ];
+
+    let noCount = 0;
+    let yesScale = 1;
+
+    function handleNo() {
+        const no = document.getElementById('btnNo');
+        const yes = document.getElementById('btnYes');
+
+        no.innerText = noTexts[noCount % noTexts.length];
+        noCount++;
+
+        no.style.transform = `scale(${Math.max(0.5,1-noCount*0.1)})`;
+        yesScale += 0.3;
+        yes.style.transform = `scale(${yesScale})`;
+    }
+
+    function handleYes() {
+        document.getElementById('question-content').style.display = 'none';
+        document.getElementById('success-message').style.display = 'block';
+        createPetals();
+        createPetals();
+    }
+</script>
+
+</body>
+</html>
